@@ -1,0 +1,58 @@
+{% extends "myapp/base.html" %}
+
+{% block title %}Eliminar Anime{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h3 class="mb-0">🗑️ Confirmar Eliminación</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning" role="alert">
+                            <strong>⚠️ Advertencia:</strong> Esta acción no se puede deshacer.
+                        </div>
+                        
+                        <p class="lead">¿Estás seguro de que deseas eliminar el siguiente anime?</p>
+                        
+                        <div class="card mb-3">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="{{ object.image_url }}" 
+                                         class="img-fluid rounded-start" 
+                                         alt="{{ object.title }}"
+                                         style="max-height: 200px; object-fit: cover;">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ object.title }}</h5>
+                                        <p class="card-text">
+                                            <strong>Tipo:</strong> {{ object.type }}<br>
+                                            <strong>Puntuación:</strong> {{ object.score }}<br>
+                                            <strong>Episodios:</strong> {{ object.episodes }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="d-flex gap-2 justify-content-end">
+                                <a href="{% url 'anime_detail' pk=object.pk %}" class="btn btn-secondary">
+                                    Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-danger">
+                                    🗑️ Sí, Eliminar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

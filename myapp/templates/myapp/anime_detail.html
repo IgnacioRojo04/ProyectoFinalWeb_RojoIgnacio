@@ -1,0 +1,91 @@
+{% extends "myapp/base.html" %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        {% if error_mensaje %}
+            <div class="alert alert-danger" role="alert">
+                {{ error_mensaje }}
+            </div>
+            <a href="{% url 'anime_list' %}" class="btn btn-secondary">← Volver a la lista</a>
+        {% elif anime %}
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="{{ anime.images.jpg.image_url }}"
+                         class="img-fluid rounded shadow"
+                         alt="{{ anime.title }}"
+                         loading="lazy"
+                         onerror="this.src='https://via.placeholder.com/400x600/6c757d/ffffff?text=Imagen+No+Disponible';">
+
+                    {% if is_local %}
+                        <div class="alert alert-success mt-3" role="alert">
+                            <strong>📚 Anime de tu colección personal</strong>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-8">
+                    <h1 class="mb-3">{{ anime.title }}</h1>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Información General</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <strong>Puntuación:</strong>
+                                    <span class="badge bg-warning text-dark">{{ anime.score|default:'N/A' }}</span>
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Tipo:</strong> {{ anime.type|default:'N/A' }}
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Episodios:</strong> {{ anime.episodes|default:'Desconocido' }}
+                                </li>
+                                {% if anime.status %}
+                                <li class="list-group-item">
+                                    <strong>Estado:</strong> {{ anime.status }}
+                                </li>
+                                {% endif %}
+                                {% if anime.aired %}
+                                <li class="list-group-item">
+                                    <strong>Emisión:</strong> {{ anime.aired.string|default:'N/A' }}
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    {% if anime.synopsis %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Sinopsis</h5>
+                            <p class="card-text">{{ anime.synopsis }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="{% url 'anime_list' %}" class="btn btn-secondary">
+                            ← Volver a la lista
+                        </a>
+
+                        {% if is_local %}
+                            <a href="{% url 'anime_update' pk=anime.mal_id %}" class="btn btn-primary">
+                                ✏️ Editar
+                            </a>
+                            <a href="{% url 'anime_delete' pk=anime.mal_id %}" class="btn btn-danger">
+                                🗑️ Eliminar
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-warning" role="alert">
+                No se encontró información del anime.
+            </div>
+            <a href="{% url 'anime_list' %}" class="btn btn-secondary">← Volver a la lista</a>
+        {% endif %}
+    </div>
+{% endblock %}

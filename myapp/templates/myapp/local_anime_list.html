@@ -1,0 +1,25 @@
+{% extends "myapp/base.html" %}
+
+{% block title %}Mi Colección Local (CRUD){% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Mi Colección de Animes</h1>
+    
+    <button type="button" 
+            class="btn btn-success mb-4 shadow" 
+            data-bs-toggle="modal" 
+            data-bs-target="#createAnimeModal">
+        ➕ Crear Nuevo Anime (Modal)
+    </button>
+    
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for anime in local_animes %}
+        <div class="col">
+            <div class="card h-100 shadow">
+                </div>
+        </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}
+

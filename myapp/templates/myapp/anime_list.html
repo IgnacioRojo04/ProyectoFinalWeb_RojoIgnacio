@@ -1,0 +1,148 @@
+{% extends "myapp/base.html" %}
+{% load static %}
+
+{% block title %}Lista de Animes{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4 text-center text-primary">{{ titulo }}</h1>
+
+    {% if error_mensaje %}
+        <div class="alert alert-danger" role="alert">
+            {{ error_mensaje }}
+        </div>
+    {% endif %}
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for anime in animes %}
+        <div class="col">
+            <div class="card h-100 shadow {% if anime.is_local %}border-success border-2{% endif %}">
+                <img src="{{ anime.images.jpg.image_url }}"
+                     class="card-img-top"
+                     alt="{{ anime.title }}"
+                     style="height: 350px; object-fit: cover;"
+                     loading="lazy"
+                     onerror="this.src='https://via.placeholder.com/350x500/6c757d/ffffff?text=Imagen+No+Disponible';">
+
+                {% if anime.is_local %}
+                <span class="badge bg-success"
+                      style="position: absolute; top: 10px; left: 10px; z-index: 10;">
+                    📚 Mi Colección
+                </span>
+                {% endif %}
+
+                <button
+                    class="btn-sm favorite-button {% if anime.is_favorite %}bg-danger{% else %}bg-warning{% endif %}"
+                    data-anime-id="{{ anime.mal_id }}"
+                    data-is-local="{{ anime.is_local|lower }}"
+                    data-title="{{ anime.title }}"
+                    data-image-url="{{ anime.images.jpg.image_url }}"
+                    data-score="{{ anime.score }}"
+                    data-episodes="{{ anime.episodes }}"
+                    data-type="{{ anime.type }}"
+                    data-is-favorite="{{ anime.is_favorite|lower }}"
+                    style="position: absolute; top: 10px; right: 10px; opacity: 0.9; width: 40px; height: 40px; border-radius: 50%; padding: 0; z-index: 10; border: 2px solid white;"
+                    title="{% if anime.is_favorite %}Quitar de Favoritos{% else %}Añadir a Favoritos{% endif %}"
+                >
+                    ★
+                </button>
+                <div class="card-body">
+                    <h5 class="card-title text-truncate">{{ anime.title }}</h5>
+                    <p class="card-text">
+                        Puntuación:
+                        <span class="badge bg-warning text-dark">{{ anime.score|default:'N/A' }}</span>
+                    </p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            {{ anime.type }} | {{ anime.episodes|default:'?' }} Episodios
+                        </small>
+                    </p>
+                    <a href="{% url 'anime_detail' pk=anime.mal_id %}" class="btn btn-primary btn-sm">
+                        Ver Detalle
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const favoriteButtons = document.querySelectorAll('.favorite-button');
+
+        favoriteButtons.forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const animeId = this.dataset.animeId;
+                const isLocal = this.dataset.isLocal === 'true';
+                const title = this.dataset.title;
+                const imageUrl = this.dataset.imageUrl;
+                const score = this.dataset.score;
+                const episodes = this.dataset.episodes;
+                const type = this.dataset.type;
+
+                try {
+                    const response = await fetch('/api/toggle-favorite/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({
+                            anime_id: animeId,
+                            is_local: isLocal,
+                            title: title,
+                            image_url: imageUrl,
+                            score: score,
+                            episodes: episodes,
+                            type: type
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        if (data.is_favorite) {
+                            this.classList.remove('bg-warning');
+                            this.classList.add('bg-danger');
+                            this.title = 'Quitar de Favoritos';
+                        } else {
+                            this.classList.remove('bg-danger');
+                            this.classList.add('bg-warning');
+                            this.title = 'Añadir a Favoritos';
+                        }
+
+                        this.dataset.isFavorite = data.is_favorite;
+                    } else {
+                        alert('Error al actualizar favorito: ' + data.error);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error al conectar con el servidor');
+                }
+            });
+        });
+    });
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}
+
+
+   
