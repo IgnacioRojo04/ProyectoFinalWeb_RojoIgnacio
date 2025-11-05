@@ -27,7 +27,7 @@ Este proyecto es una aplicación web desarrollada con Django que permite gestion
 
 1. Crear y activar entorno virtual:
 ```bash
-python -m venv .venv
+py -m venv .venv
 .\.venv\Scripts\activate
 ```
 
@@ -42,18 +42,12 @@ pip install requests
 pip install -r requirements.txt
 ```
 
-4. Realizar migraciones:
-```bash
-python manage.py makemigrations
-python manage.py migrate
-```
-
-5. Ejecutar servidor de desarrollo:
+4. Ejecutar servidor de desarrollo:
 ```bash
 python manage.py runserver
 ```
 
-6. Abrir en navegador:
+5. Abrir en navegador:
 ```
 http://127.0.0.1:8000/
 ```
